@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#05060b">
+  <meta name="color-scheme" content="dark">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="manifest" href="manifest.webmanifest">
+  <title>Норма конуры базаров</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="bg-glow bg-a"></div><div class="bg-glow bg-b"></div>
+  <div id="mobileSheet" class="mobile-sheet hidden"><button class="sheet-backdrop" aria-label="Закрыть"></button><div class="sheet-panel"><div class="sheet-handle"></div><div id="mobileNav"></div></div></div>
+
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="#" aria-label="На главную">
+        <span class="logo">Н</span>
+        <span class="brand-copy"><strong>Норма конуры базаров</strong><small>контроль администрации</small></span>
+      </a>
+      <nav class="tabs" id="tabs" aria-label="Разделы">
+        <button class="nav-item active" data-view="dashboard">Обзор</button>
+        <button class="nav-item" data-view="admins">Администраторы</button>
+        <button class="nav-item hidden" data-view="bans">Бан-логи</button>
+        <button class="nav-item" data-view="joins">Вступления</button>
+        <button class="nav-item hidden" data-view="norms">Нормы</button>
+        <button class="nav-item hidden" data-view="iris">Ирис</button>
+        <button class="nav-item hidden" data-view="activity">История</button>
+      </nav>
+      <div class="user-bar">
+        <div class="user-meta"><div id="headerAvatar" class="avatar">Н</div><div><b id="headerName">Гость</b><span id="headerRole">Только просмотр</span></div></div>
+        <a id="loginBtn" class="btn btn-ghost compact" href="/auth/login">Войти через Telegram</a>
+        <button id="logoutBtn" class="btn btn-ghost compact hidden">Выйти</button>
+        <button id="mobileMenu" class="icon-btn mobile-only" aria-label="Меню">☰</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="page">
+    <section id="dashboardView" class="view">
+      <div class="hero">
+        <div><div class="hero-kicker"><span class="live-dot"></span><span>СИСТЕМА В СЕТИ</span><span id="accessBadge" class="access-badge">ПУБЛИЧНЫЙ ПРОСМОТР</span></div><span class="eyebrow">ЕДИНЫЙ ЦЕНТР КОНТРОЛЯ</span><h1>Администрация без хаоса.</h1><p>Публичная витрина команды и заявок. Закрытые разделы с нормами, бан-логами и Ирис открываются после Telegram-входа для управляющей, совладельца и разработчика.</p></div>
+        <div class="hero-actions"><button id="quickRefresh" class="btn btn-ghost">↻ Обновить</button><button id="quickAddBan" data-private-action class="btn btn-danger hidden">+ Бан</button><button id="quickAddAdmin" data-private-action class="btn btn-primary hidden">+ Администратор</button></div>
+      </div>
+      <div class="metric-grid">
+        <article class="metric"><div><span>АДМИНИСТРАТОРОВ</span><strong id="mAdmins">0</strong><small>в текущем составе</small></div><div class="metric-icon">◈</div></article>
+        <article class="metric"><div><span>БАНОВ</span><strong id="mBans">0</strong><small>за выбранный период</small></div><div class="metric-icon">⌁</div></article>
+        <article class="metric"><div><span>ПРИНЯТО</span><strong id="mAccepted">0</strong><small>участников за период</small></div><div class="metric-icon">↗</div></article>
+        <article class="metric metric-alert"><div><span>ТРЕБУЮТ ВНИМАНИЯ</span><strong id="mAlerts">0</strong><small>ниже 100% нормы</small></div><div class="metric-icon">!</div></article>
+      </div>
+      <div class="dashboard-grid">
+        <section class="surface large"><div class="section-head"><div><span class="eyebrow">СОСТАВ</span><h2>Контроль администрации</h2></div><button class="text-btn" data-go="admins">Открыть таблицу →</button></div><div id="miniAdmins" class="mini-admins"></div></section>
+        <section class="surface"><div class="section-head"><div><span class="eyebrow">ПОСЛЕДНИЕ ДЕЙСТВИЯ</span><h2>Журнал</h2></div><button class="text-btn" data-go="activity" data-private-view="activity">Вся история →</button></div><div id="miniActivity" class="activity-list"></div></section>
+        <section class="surface"><div class="section-head"><div><span class="eyebrow">ЗАЯВКИ</span><h2>Кто принят</h2></div><button class="text-btn" data-go="joins">Подробнее →</button></div><div id="miniJoins" class="activity-list"></div></section>
+        <section class="surface"><div class="section-head"><div><span class="eyebrow">ПЕРИОД</span><h2>Текущий контроль</h2></div></div><div class="period-card"><div class="period-dates"><span id="periodStart">—</span><i>→</i><span id="periodEnd">—</span></div><div class="period-bar"><div id="periodProgress"></div></div><div class="period-meta"><span id="periodDays">—</span><span id="periodStatus">—</span></div></div></section>
+      </div>
+    </section>
+
+    <section id="adminsView" class="view hidden">
+      <div class="page-title"><div><span class="eyebrow">АДМИНИСТРАЦИЯ</span><h1>Администраторы</h1><p>Редактируй состав, показатели и роли. Итоговый процент считается из двух нормативов автоматически.</p></div><div class="action-row"><button id="exportAdmins" data-private-action class="btn btn-ghost hidden">⇩ CSV</button><button id="addAdmin" data-private-action class="btn btn-primary hidden">+ Добавить</button></div></div>
+      <div class="surface"><div class="filters"><label class="search"><span>⌕</span><input id="adminSearch" placeholder="Имя, UID, Telegram"></label><select id="adminRoleFilter" class="field"><option value="all">Все роли</option></select><select id="adminStatusFilter" class="field"><option value="all">Все статусы</option><option value="done">Выполнено</option><option value="progress">В процессе</option><option value="low">Недобор</option></select></div>
+        <div class="admin-table-wrap"><table class="admin-table"><thead><tr><th>АДМИНИСТРАТОР</th><th>РОЛЬ</th><th>БАНЫ</th><th>ПРИНЯТО</th><th>НОРМА</th><th>ВЫПОЛНЕНИЕ</th><th>СТАТУС</th><th></th></tr></thead><tbody id="adminsTable"></tbody></table></div>
+        <div class="table-note"><span id="adminCount">0</span> показано <span class="dot">•</span> редактирование доступно после Telegram-входа</div>
+      </div>
+    </section>
+
+    <section id="bansView" class="view hidden">
+      <div class="page-title"><div><span class="eyebrow">АУДИТ НАКАЗАНИЙ</span><h1>Бан-логи</h1><p>Кто, кого, за что и на какой срок заблокировал.</p></div><div class="action-row"><button id="addBan" data-private-action class="btn btn-danger hidden">+ Добавить бан</button></div></div>
+      <div class="surface"><div class="filters"><label class="search"><span>⌕</span><input id="banSearch" placeholder="Пользователь, админ, UID"></label><select id="banReason" class="field"><option value="all">Все причины</option><option>Спам</option><option>Реклама</option><option>Оскорбления</option><option>Читы</option><option>Другое</option><option>Telegram: бан</option></select><select id="banDuration" class="field"><option value="all">Все сроки</option><option>Навсегда</option><option>30 дней</option><option>7 дней</option><option>1 день</option><option>Не указано</option></select></div><div class="admin-table-wrap"><table class="admin-table"><thead><tr><th>ВРЕМЯ</th><th>ПОЛЬЗОВАТЕЛЬ</th><th>ПРИЧИНА</th><th>АДМИНИСТРАТОР</th><th>СРОК</th><th>UID</th><th></th></tr></thead><tbody id="bansTable"></tbody></table></div></div>
+    </section>
+
+    <section id="joinsView" class="view hidden">
+      <div class="page-title"><div><span class="eyebrow">ВСТУПЛЕНИЯ</span><h1>Заявки и принятые</h1><p>Проверяй реальное количество принятых пользователей и обрабатывай заявки.</p></div><div class="action-row"><button id="addRequest" class="btn btn-primary">+ Заявка</button></div></div>
+      <div class="dashboard-grid two-up"><section class="surface"><div class="section-head"><div><span class="eyebrow">НАГРУЗКА</span><h2>Принято по администраторам</h2></div></div><div id="joinBars"></div></section><section class="surface"><div class="section-head"><div><span class="eyebrow">ОЧЕРЕДЬ</span><h2>Заявки на вступление</h2></div></div><div id="requestsList" class="request-list"></div></section></div>
+    </section>
+
+    <section id="normsView" class="view hidden">
+      <div class="page-title"><div><span class="eyebrow">ТРЕБОВАНИЯ</span><h1>Нормы и расчёт</h1><p>Меняй требования по ролям — все проценты пересчитаются автоматически.</p></div></div>
+      <div class="dashboard-grid two-up"><section class="surface"><div class="section-head"><div><span class="eyebrow">ПО РОЛЯМ</span><h2>Норма за период</h2></div><span id="normEditState" class="role-access">только просмотр</span></div><div id="roleNorms"></div></section><section class="surface"><div class="section-head"><div><span class="eyebrow">ФАКТ</span><h2>Выполнение по людям</h2></div></div><div id="normPeople"></div></section></div>
+    </section>
+
+    <section id="irisView" class="view hidden">
+      <div class="page-title"><div><span class="eyebrow">ИНТЕГРАЦИЯ</span><h1>Ирис</h1><p>Импортируй фактические показатели и бан-логи. После импорта всё пересчитывается на сервере.</p></div></div>
+      <div class="integration-row"><div class="integration-card"><span class="service-icon iris">I</span><div><b>Ирис</b><small>импорт статистики</small></div><span class="chip blue">АДАПТЕР</span></div><div class="integration-card"><span class="service-icon telegram">➤</span><div><b>Telegram</b><small>вход и права</small></div><span class="chip green">OAUTH</span></div></div>
+      <div class="surface"><div class="section-head"><div><span class="eyebrow">JSON</span><h2>Импорт статистики</h2></div><span class="role-access">только для управления</span></div><textarea id="irisPayload" class="code" spellcheck="false" placeholder='{"admins":[...],"bans":[...]}'></textarea><div class="action-row"><button id="loadIrisSample" class="btn btn-ghost">Пример</button><button id="importIris" class="btn btn-primary">Импортировать</button></div></div>
+      <div class="surface"><div class="section-head"><div><span class="eyebrow">ПОДСКАЗКА</span><h2>Как это работает</h2></div></div><div class="steps"><div><b>01</b><span>Получаешь статистику из Ирис</span></div><div><b>02</b><span>Вставляешь JSON</span></div><div><b>03</b><span>Сервер обновляет факты и пересчитывает нормы</span></div></div></div>
+    </section>
+
+    <section id="activityView" class="view hidden">
+      <div class="page-title"><div><span class="eyebrow">АУДИТ СИСТЕМЫ</span><h1>История изменений</h1><p>Фиксируются действия управляющей, совладельца и разработчика.</p></div><div class="action-row"><button id="exportActivity" class="btn btn-ghost">⇩ CSV</button></div></div>
+      <div class="surface"><div class="filters"><label class="search"><span>⌕</span><input id="activitySearch" placeholder="Поиск по действию, объекту или пользователю"></label><select id="activityType" class="field"><option value="all">Все действия</option><option>admin.create</option><option>admin.update</option><option>admin.delete</option><option>ban.create</option><option>ban.update</option><option>ban.delete</option><option>request.create</option><option>request.accept</option><option>request.reject</option><option>role.update</option><option>iris.import</option></select></div><div id="activityList" class="history-list"></div></div>
+    </section>
+  </main>
+
+  <dialog id="adminDialog"><form method="dialog" id="adminForm" class="modal-card"><div class="modal-head"><div><span class="eyebrow">СОСТАВ</span><h2 id="adminDialogTitle">Добавить администратора</h2></div><button class="icon-btn" value="cancel">×</button></div><input type="hidden" name="id"><div class="form-grid"><label>Имя<input name="name" required maxlength="80"></label><label>UID<input name="uid" required maxlength="32"></label><label>Telegram<input name="telegram" placeholder="@username" maxlength="64"></label><label>Telegram ID<input name="telegramId" inputmode="numeric" pattern="\d{1,20}" maxlength="20" placeholder="123456789"></label><label>Роль<select name="role" id="adminDialogRole"></select></label><label>Баны<input name="bans" type="number" min="0" max="100000" required></label><label>Принято<input name="accepted" type="number" min="0" max="100000" required></label></div><div class="modal-actions"><button class="btn btn-ghost" value="cancel">Отмена</button><button class="btn btn-primary" value="default">Сохранить</button></div></form></dialog>
+
+  <dialog id="banDialog"><form method="dialog" id="banForm" class="modal-card"><div class="modal-head"><div><span class="eyebrow">НАКАЗАНИЕ</span><h2 id="banDialogTitle">Добавить бан</h2></div><button class="icon-btn" value="cancel">×</button></div><input type="hidden" name="id"><div class="form-grid"><label>Пользователь<input name="user" required maxlength="80"></label><label>UID<input name="uid" required maxlength="32"></label><label>Причина<select name="reason"><option>Спам</option><option>Реклама</option><option>Оскорбления</option><option>Читы</option><option>Другое</option><option>Telegram: бан</option></select></label><label>Срок<select name="duration"><option>Навсегда</option><option>30 дней</option><option>7 дней</option><option>1 день</option><option>Не указано</option></select></label><label>Администратор<select name="adminId" id="banAdmin"></select></label><label>Время<input name="time" type="datetime-local" required></label></div><div class="modal-actions"><button class="btn btn-ghost" value="cancel">Отмена</button><button class="btn btn-danger" value="default">Сохранить</button></div></form></dialog>
+
+  <dialog id="requestDialog"><form method="dialog" id="requestForm" class="modal-card"><div class="modal-head"><div><span class="eyebrow">ВСТУПЛЕНИЕ</span><h2>Добавить заявку</h2></div><button class="icon-btn" value="cancel">×</button></div><input type="hidden" name="id"><div class="form-grid"><label>Пользователь<input name="user" required maxlength="80"></label><label>UID<input name="uid" maxlength="32"></label><label>Статус<select name="status"><option value="pending">На рассмотрении</option><option value="accepted">Принята</option><option value="rejected">Отклонена</option></select></label><label>Кто принял<select name="adminId" id="requestAdmin"></select></label><label>Время<input name="time" type="datetime-local" required></label></div><div class="modal-actions"><button class="btn btn-ghost" value="cancel">Отмена</button><button class="btn btn-primary" value="default">Сохранить</button></div></form></dialog>
+
+  <div id="toast" class="toast"></div>
+  <script src="app.js"></script>
+</body>
+</html>

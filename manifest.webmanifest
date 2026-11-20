@@ -1,0 +1,9 @@
+{
+  "name": "Норма конуры базаров",
+  "short_name": "Норма",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#040609",
+  "theme_color": "#05070a",
+  "description": "Панель контроля администрации Telegram-группы"
+}
